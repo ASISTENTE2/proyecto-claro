@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Reportes - Claro</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+#all-reports-list-container {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.report-card {
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: auto;
+    min-height: 250px;
+}
+
+.report-card:hover {
+    transform: translateY(-3px);
+}
+
+.report-card .card-header {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.report-card .card-content p {
+    margin-bottom: 5px;
+    line-height: 1.4;
+    color: #555;
+}
+
+.report-card .card-content strong {
+    color: #333;
+}
+
+.report-card .card-content small {
+    display: block;
+    margin-top: 10px;
+    color: #888;
+    font-size: 0.85em;
+}
+
+.report-card .card-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.report-card .card-actions button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.report-card .assign-report-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.report-card .assign-report-button:hover {
+    background-color: #0056b3;
+}
+
+.report-card .resolve-report-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.report-card .resolve-report-button:hover {
+    background-color: #218838;
+}
+
+.report-card .status-pending {
+    border-left: 5px solid #ffc107;
+}
+
+.report-card .status-in-progress {
+    border-left: 5px solid #17a2b8;
+}
+
+.report-card .status-resolved {
+    border-left: 5px solid #28a745;
+}
+
+.resolve-form-container {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.resolve-form-container textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.resolve-form-container button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-right: 10px;
+}
+
+.resolve-form-container .submit-resolution-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.resolve-form-container .submit-resolution-button:hover {
+    background-color: #218838;
+}
+
+.resolve-form-container .cancel-resolution-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.resolve-form-container .cancel-resolution-button:hover {
+    background-color: #c82333;
+}
+
+.employee-list-container {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    width: 200px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.employee-item {
+    padding: 8px 5px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9em;
+}
+
+.employee-item:last-child {
+    border-bottom: none;
+}
+
+.employee-item:hover {
+    background-color: #f0f0f0;
+}
+
+.hidden {
+    display: none;
+}
+</style>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <h1 class="header-title">Panel de Control de Reportes</h1>
+            <nav class="main-nav">
+                <ul>
+                    <li id="nav-link-reports-client" style="display: none;"><a href="reports.html">Mis Reportes</a></li>
+                    <li id="nav-link-reports-employee" style="display: none;"><a href="reports.html">Gestión de Reportes</a></li>
+                    <li id="nav-link-machines" style="display: none;"><a href="index.html">Máquinas</a></li>
+                    <li><a href="#" id="logout-button">Cerrar Sesión</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div id="client-view-section" style="display: none;">
+            <div class="report-form-section">
+                <h2>Registrar Nuevo Problema</h2>
+                <form id="report-form">
+                    <div class="form-group">
+                        <label for="problemTitle">Título del Problema:</label>
+                        <input type="text" id="problemTitle" name="problemTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="problemDescription">Descripción Detallada:</label>
+                        <textarea id="problemDescription" name="problemDescription" rows="6" required></textarea>
+                    </div>
+                    <button type="submit">Enviar Reporte</button>
+                </form>
+                <div id="message" class="form-message"></div>
+            </div>
+
+            <div class="filters-section">
+                <h2>Historial de Mis Reportes</h2>
+            </div>
+
+            <div class="reports-list-container" id="client-reports-list">
+                <p>Cargando reportes...</p>
+            </div>
+        </div>
+
+        <div id="employee-view-section" style="display: none;">
+            <div class="filters-section">
+                <h2>Listado de Todos los Reportes</h2>
+            </div>
+            <div class="reports-list-container" id="all-reports-list-container">
+                <p>Cargando reportes...</p>
+            </div>
+            </div>
+
+    </main>
+
+    <footer class="main-footer">
+        <p>© 2025 Control de Empresa.</p>
+        <div class="footer-links">
+            <a href="politicaPriv.html">Política de Privacidad</a> |
+            <a href="terminosSegu.html">Términos de Servicio</a>
+        </div>
+    </footer>
+
+    <script src="reportClient.js"></script>
+    <script src="reportes.js"></script> 
+</body>
+</html>
